@@ -53,7 +53,7 @@ def handle_image_query(image_url):
         return "Class indices not found."
 
     logger.info(f"Loading class indices from: {class_indices_path}")
-    with open(class_indices_path, 'r', encoding='utf8') as f:
+    with open(class_indices_path, 'r', encoding='utf-8') as f:
         class_indices = json.load(f)
     class_labels = {v: k for k, v in class_indices.items()}
 

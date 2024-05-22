@@ -3,7 +3,7 @@ import os
 import tensorflow as tf
 import json
 
-from chatbot.config import TRAIN_DIR, VALIDATION_DIR, RESOURCES_DIR
+from chatbot.config import TRAIN_DIR, VALIDATION_DIR, RESOURCES_DIR, MODEL_DIR
 
 
 def create_image_generators(train_dir, validation_dir, target_size=(150, 150), batch_size=32):
@@ -26,7 +26,7 @@ def create_image_generators(train_dir, validation_dir, target_size=(150, 150), b
     )
 
     # Save class indices
-    with open(os.path.join(RESOURCES_DIR, 'class_indices.json'), 'w') as f:
+    with open(os.path.join(RESOURCES_DIR, 'class_indices.json'), 'w', encoding="utf-8") as f:
         json.dump(train_generator.class_indices, f)
         print("Saved class indices to class_indices.json")
 
@@ -61,7 +61,7 @@ def compile_and_train_model(model, train_generator, validation_generator, epochs
     return model, history
 
 
-def save_model(model, file_path='./model/weapon_classifier_model.keras'):
+def save_model(model, file_path=os.path.join(MODEL_DIR, 'weapon_classifier_model.keras')):
     model.save(file_path)
 
 

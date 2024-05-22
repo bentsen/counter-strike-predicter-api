@@ -1,4 +1,7 @@
+import locale
 import os
+import sys
+
 from fastapi import FastAPI
 from dotenv import load_dotenv
 
@@ -8,6 +11,13 @@ from chatbot.model.train_model import train_model
 from predictor.config import MODEL_DIR as MODEL_DIR_PREDICTOR
 from predictor.csgo_round_ai import GameData, predict_round, process_data, train_and_save_model
 from starlette.middleware.cors import CORSMiddleware
+
+
+# Set UTF-8 encoding explicitly
+os.environ['PYTHONIOENCODING'] = 'utf-8'
+sys.stdout.reconfigure(encoding='utf-8')
+sys.stderr.reconfigure(encoding='utf-8')
+locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
 # Load environment variables from .env file
 load_dotenv()
