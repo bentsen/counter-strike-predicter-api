@@ -1,0 +1,24 @@
+# Ignore model files in both chatbot and predictor directories
+chatbot/models/
+predictor/models/
+*.keras
+*.pkl
+
+# Ignore Python compiled files
+*.pyc
+__pycache__/
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore virtual environments
+env/
+venv/
+.venv/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore configuration files
+*.env
