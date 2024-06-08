@@ -13,12 +13,11 @@ from langchain_openai.embeddings import OpenAIEmbeddings
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 
-from chatbot.config import RESOURCES_DIR
+from config.settings import RESOURCES_DIR, OPENAI_API_KEY
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
 
 def get_csv_column(file_path):
     df = pd.read_csv(file_path, nrows=0)
@@ -26,7 +25,6 @@ def get_csv_column(file_path):
     source_column = columns[0]
     metadata_columns = columns[1:]
     return source_column, metadata_columns
-
 
 def load_and_split_documents(file_path, chunk_size=1000, chunk_overlap=100):
     if not os.path.exists(file_path):
@@ -45,7 +43,6 @@ def load_and_split_documents(file_path, chunk_size=1000, chunk_overlap=100):
         logger.error(f"Error loading {file_path}: {e}")
         return []
 
-
 def create_prompt_template():
     template_str = """Use the following pieces of context to answer the question at the end. 
     If you don't know the answer, just say that you don't know, don't try to make up an answer. 
@@ -59,15 +56,13 @@ def create_prompt_template():
     """
     return PromptTemplate(input_variables=["context", "question"], template=template_str)
 
-
 def initialize_chain():
-    openai_api_key = os.getenv('OPENAI_API_KEY')
-    if not openai_api_key:
+    if not OPENAI_API_KEY:
         logger.error("API key for OpenAI must be set in environment variables.")
         return None
 
     try:
-        embeddings_model = OpenAIEmbeddings(api_key=openai_api_key)
+        embeddings_model = OpenAIEmbeddings(api_key=OPENAI_API_KEY)
         documents = load_and_split_documents(os.path.join(RESOURCES_DIR, 'csv', 'CSGO-Weapons-Data.csv'))
 
         if not documents:
@@ -75,7 +70,7 @@ def initialize_chain():
             return None
 
         vectordb = Chroma.from_documents(documents=documents, embedding=embeddings_model)
-        llm = ChatOpenAI(model="gpt-3.5-turbo", api_key=openai_api_key,
+        llm = ChatOpenAI(model="gpt-3.5-turbo", api_key=OPENAI_API_KEY,
                          callback_manager=CallbackManager([StreamingStdOutCallbackHandler()]))
         prompt_template = create_prompt_template()
         chain = RetrievalQA.from_chain_type(llm, retriever=vectordb.as_retriever(), return_source_documents=True,
@@ -84,7 +79,6 @@ def initialize_chain():
     except Exception as e:
         logger.error(f"An error occurred: {e}")
         return None
-
 
 def handle_query(description, chain):
     response = chain({"query": description})

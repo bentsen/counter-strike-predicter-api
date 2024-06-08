@@ -1,4 +1,4 @@
-# Ignore model files in both chatbot and predictor directories
+# Ignore model files in both predictors and predictor directories
 chatbot/models/
 predictor/models/
 *.keras
