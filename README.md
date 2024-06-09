@@ -124,18 +124,18 @@ The project repository is divided into two parts:
    ```bash
    npm run dev
 
-### Usage
+## Usage
 
   - **Round Prediction:** Follow the website stepper guidance to select the wanted data for a specific round.
   - **Chatbot:**  Interact with the chatbot via the web interface to ask questions or upload images of weapons/skins.
 
-### Repositories
+## Repositories
 The complete project code can be found on our GitHub repositories:
 - [Backend Repository](https://github.com/bentsen/counter-strike-predicter-api)
 - [Frontend Repository](https://github.com/bentsen/counter-strike-predicter)
 
 
-### Conclusion
+## Conclusion
 Our AI project aims to enhance the Counter-Strike gaming experience by leveraging machine learning for predicting round outcomes and an interactive chatbot for game-related question and item identification. 
 These tools are designed to reduce the learning curve for new players and provide strategic insights for experienced players. By improving prediction accuracy and engagement, our AI-powered solutions will make Counter-Strike more accessible and enjoyable for all players, significantly impacting the competitive gaming landscape.
    
