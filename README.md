@@ -49,6 +49,7 @@ The project repository contains the following directories:
 - `data/`: Includes all the data used to train machine learning models.
 - `src/`: Contains all the main code for the project.
   - `src/bots/`: Contains both of the chatbots (CNN and NLP) in the form of text and image responses.
+  - `src/graphs/`: Contains graphs generated from the predictor ai.
   - `src/models/`: Includes files for training the CNN and NLP models, and stores the trained models.
   - `src/predictors/`: Contains the trainer and model for the Random Forest Classifier.
   - `src/scrapers/`: Contains files to scrape websites for data needed to train NLP.
