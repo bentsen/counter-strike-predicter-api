@@ -103,3 +103,41 @@ The project repository is divided into two parts:
    ```bash
    git clone https://github.com/bentsen/counter-strike-predicter-api.git
    cd counter-strike-predicter-api
+2. Create Virtual environment
+   ```bash
+   python -m venv venv
+   source venv/bin/activate   # On Windows use `venv\Scripts\activate`
+3. Install the dependencies
+   ```bash
+   pip install -r requirements.txt
+
+#### Frontend
+
+1. Clone the repository
+   ```bash
+   git clone https://github.com/bentsen/counter-strike-predicter.git
+   cd counter-strike-predicter
+2. Intall dependencies
+   ```bash
+   npm install
+3. Run server
+   ```bash
+   npm run dev
+
+### Usage
+
+  - **Round Prediction:** Follow the website stepper guidance to select the wanted data for a specific round.
+  - **Chatbot:**  Interact with the chatbot via the web interface to ask questions or upload images of weapons/skins.
+
+### Repositories
+The complete project code can be found on our GitHub repositories:
+- [Backend Repository](https://github.com/bentsen/counter-strike-predicter-api)
+- [Frontend Repository](https://github.com/bentsen/counter-strike-predicter)
+
+
+### Conclusion
+Our AI project aims to enhance the Counter-Strike gaming experience by leveraging machine learning for predicting round outcomes and an interactive chatbot for game-related question and item identification. 
+These tools are designed to reduce the learning curve for new players and provide strategic insights for experienced players. By improving prediction accuracy and engagement, our AI-powered solutions will make Counter-Strike more accessible and enjoyable for all players, significantly impacting the competitive gaming landscape.
+   
+   
+
