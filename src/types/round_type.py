@@ -40,3 +40,4 @@ class GameData(BaseModel):
     t: List[Team]
     ct: List[Team]
     selectedMap: str
+    matchData: MatchData

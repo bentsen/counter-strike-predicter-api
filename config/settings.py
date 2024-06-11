@@ -5,7 +5,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Data directory
 DATA_DIR = os.path.join(BASE_DIR, 'data')
+
+# Train directory
 TRAIN_DIR = os.path.join(DATA_DIR, 'train')
+
+# Validation directory
 VAL_DIR = os.path.join(DATA_DIR, 'val')
 
 # Models directory

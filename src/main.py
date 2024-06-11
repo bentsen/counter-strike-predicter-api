@@ -1,20 +1,16 @@
 import locale
 import os
 import sys
-import logging
 
-from fastapi import FastAPI, UploadFile, File, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 
 from src.bots.image_response_bot import ImageResponseBot
 from src.bots.text_response_bot import TextResponseBot
-from src.predictors.csgo_round_predictor import CSGORoundPredictor, process_data
+from src.predictors.csgo_round_predictor import CSGORoundPredictor
 from src.types.round_type import GameData
 from src.types.chatbot_type import Chatbot
-from config.settings import MODEL_DIR as MODEL_DIR_PREDICTOR, MODEL_DIR as MODEL_DIR_CHATBOT
-from src.models.cnn.cnn_trainer import train_model
 
 # Set UTF-8 encoding explicitly
 os.environ['PYTHONIOENCODING'] = 'utf-8'
@@ -52,15 +48,8 @@ async def predict_image(response: Chatbot):
 
 @app.post("/predict/round")
 async def predict_round(game_data: GameData):
-    try:
-        processed_data = process_data(game_data)
-        result = round_predictor.predict(processed_data)
-        if result is None:
-            raise HTTPException(status_code=500, detail="Prediction failed")
-        return JSONResponse(content={"response": result})
-    except Exception as e:
-        logging.error(f"Error predicting round outcome: {e}")
-        return JSONResponse(content={"error": str(e)}, status_code=500)
+    return round_predictor.predict_round(game_data)
+
 
 @app.get("/")
 async def root():
