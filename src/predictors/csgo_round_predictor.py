@@ -3,7 +3,7 @@ import pandas as pd
 import logging
 
 from src.predictors.graph_functions import generate_graphs
-from src.predictors.utility_functions import train_and_save_model, load_model, process_data
+from src.predictors.train_model import train_and_save_model, load_model, process_data
 from src.types.round_type import GameData
 
 logging.basicConfig(level=logging.INFO)

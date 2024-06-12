@@ -1,10 +1,14 @@
 import os
 import matplotlib.pyplot as plt
+import numpy as np
 import seaborn as sns
 import pandas as pd
 import logging
 
+from sklearn.preprocessing import LabelEncoder
+
 from config.settings import DATA_DIR
+from src.predictors.evaluations import evaluate_models, evaluate_models_across_splits
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -13,26 +17,11 @@ logger = logging.getLogger(__name__)
 
 def load_data():
     df = pd.read_csv(os.path.join(DATA_DIR, 'csgo_round_snapshots.csv'))
+    le = LabelEncoder()
 
-    # Ensure correct data types
-    df['time_left'] = pd.to_numeric(df['time_left'], errors='coerce')
-    df['ct_score'] = pd.to_numeric(df['ct_score'], errors='coerce')
-    df['t_score'] = pd.to_numeric(df['t_score'], errors='coerce')
-    df['ct_health'] = pd.to_numeric(df['ct_health'], errors='coerce')
-    df['t_health'] = pd.to_numeric(df['t_health'], errors='coerce')
-    df['ct_money'] = pd.to_numeric(df['ct_money'], errors='coerce')
-    df['t_money'] = pd.to_numeric(df['t_money'], errors='coerce')
-    df['ct_armor'] = pd.to_numeric(df['ct_armor'], errors='coerce')
-    df['t_armor'] = pd.to_numeric(df['t_armor'], errors='coerce')
     df['bomb_planted'] = df['bomb_planted'].astype(int)
-
-    # Convert round_winner to numeric
-    df['round_winner'] = df['round_winner'].map({'CT': 1, 'T': 0})
-
-    # Grenades columns
-    grenade_columns = [col for col in df.columns if 'grenade' in col]
-    for col in grenade_columns:
-        df[col] = pd.to_numeric(df[col], errors='coerce')
+    df = pd.get_dummies(df, columns=['map'], dtype=int)
+    df["round_winner"] = le.fit_transform(df["round_winner"])
 
     return df
 
@@ -51,17 +40,55 @@ def generate_graphs():
         # Aggregate data by 10-second intervals
         df_agg = df.groupby(df['time_left'] // 10 * 10).mean(numeric_only=True)
 
-        # Score Progression Over Time
-        logger.info("Creating score progression over time graph")
-        fig, ax = plt.subplots()
-        ax.plot(df_agg.index, df_agg['ct_score'], label='CT Score')
-        ax.plot(df_agg.index, df_agg['t_score'], label='T Score')
-        ax.set_xlabel('Time Left')
-        ax.set_ylabel('Score')
-        ax.set_title('Score Progression Over Time')
-        ax.legend()
-        save_plot(fig, graph_dir, 'line_charts', 'score_progression_over_time.png')
-        plt.close(fig)
+        # radar chart model performance comparison
+        logger.info("Creating radar chart model performance comparison")
+        results = evaluate_models(df)
+
+        results.set_index('Model', inplace=True)
+
+        labels = results.columns
+        num_vars = len(labels)
+
+        angles = np.linspace(0, 2 * np.pi, num_vars, endpoint=False).tolist()
+        angles += angles[:1]
+
+        fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(polar=True))
+
+        for model in results.index:
+            data = results.loc[model].tolist()
+            data += data[:1]
+            ax.plot(angles, data, label=model, linewidth=2)
+            ax.fill(angles, data, alpha=0.25)
+
+        ax.set_theta_offset(np.pi / 2)
+        ax.set_theta_direction(-1)
+
+        ax.set_thetagrids(np.degrees(angles[:-1]), labels)
+
+        plt.title('Model Performance Comparison')
+        plt.legend(loc='upper right', bbox_to_anchor=(1.3, 1.1))
+        save_plot(fig, graph_dir, 'radar_charts', 'model_performance_comparison.png')
+
+        # Performance Plots Across Different Split Ratios
+        logger.info("Creating performance plots across different split ratios")
+        results = evaluate_models_across_splits(df, [0.2, 0.3, 0.4, 0.5, 0.6])
+
+        metrics = ['Accuracy', 'Precision', 'Recall', 'F1 Score', 'ROC AUC']
+        models = results['Model'].unique()
+
+        for metric in metrics:
+            plt.figure(figsize=(10, 6))
+
+            for model in models:
+                model_results = results[results['Model'] == model]
+                plt.plot(model_results['Test Size'], model_results[metric], marker='o', label=model)
+
+            plt.title(f'{metric} across different split ratios')
+            plt.xlabel('Test Size')
+            plt.ylabel(metric)
+            plt.legend()
+            plt.grid(True)
+            save_plot(plt, graph_dir, 'performance_across_splits', f'{metric.lower()}_across_splits.png')
 
         # Health vs. Time
         logger.info("Creating health vs. time graph")
@@ -119,17 +146,6 @@ def generate_graphs():
         ax.set_ylabel('Bomb Planted')
         ax.set_title('Bomb Planting Events')
         save_plot(fig, graph_dir, 'scatter_plots', 'bomb_planting_events.png')
-        plt.close(fig)
-
-        # Round Winners by Map
-        logger.info("Creating round winners by map graph")
-        fig, ax = plt.subplots()
-        map_wins = df.groupby('map')['round_winner'].sum()
-        map_wins.plot(kind='bar', ax=ax)
-        ax.set_xlabel('Map')
-        ax.set_ylabel('Number of Rounds Won by CT')
-        ax.set_title('Round Winners by Map')
-        save_plot(fig, graph_dir, 'bar_charts', 'round_winners_by_map.png')
         plt.close(fig)
 
         # Equipment Value Over Time with Aggregation
