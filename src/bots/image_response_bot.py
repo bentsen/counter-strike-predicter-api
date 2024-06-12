@@ -2,12 +2,15 @@ import base64
 import os
 import json
 import logging
-from PIL import Image
 import numpy as np
-from io import BytesIO
 import tensorflow as tf
+
+from PIL import Image
+from io import BytesIO
 from config.settings import MODEL_DIR, DATA_DIR
 from data.base64_iamge import base64_image_string
+from src.models.cnn.cnn_trainer import train_model
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -50,8 +53,8 @@ class ImageResponseBot:
         class_indices_path = os.path.join(DATA_DIR, 'class_indices.json')
 
         if not os.path.exists(model_path):
-            logger.error(f"Model file not found at {model_path}")
-            raise FileNotFoundError(f"Model file not found at {model_path}")
+            logger.info("Model file not found. Training a new model...")
+            train_model()
 
         if not os.path.exists(class_indices_path):
             logger.error(f"Class indices file not found at {class_indices_path}")
