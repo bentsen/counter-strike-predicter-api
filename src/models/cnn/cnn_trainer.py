@@ -5,6 +5,13 @@ import json
 from config.settings import DATA_DIR, TRAIN_DIR, VAL_DIR, MODEL_DIR
 
 
+def train_model():
+    train_generator, validation_generator = create_image_generators(TRAIN_DIR, VAL_DIR)
+    model = build_model((150, 150, 3), train_generator.num_classes)
+    model, history = compile_and_train_model(model, train_generator, validation_generator)
+    save_model(model)
+
+
 def create_image_generators(train_dir, validation_dir, target_size=(150, 150), batch_size=32):
     train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1.0 / 255.0, rotation_range=20,
                                                                     zoom_range=0.2, horizontal_flip=True)
@@ -62,10 +69,3 @@ def compile_and_train_model(model, train_generator, validation_generator, epochs
 
 def save_model(model, file_path=os.path.join(MODEL_DIR, 'cnn', 'cnn_model.keras')):
     model.save(file_path)
-
-
-def train_model():
-    train_generator, validation_generator = create_image_generators(TRAIN_DIR, VAL_DIR)
-    model = build_model((150, 150, 3), train_generator.num_classes)
-    model, history = compile_and_train_model(model, train_generator, validation_generator)
-    save_model(model)
